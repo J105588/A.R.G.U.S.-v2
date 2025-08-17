@@ -1,5 +1,4 @@
-# A.R.G.U.S.-v2 - Advanced Real-time Guard & Utility System
-
+# A.R.G.U.S.-v2 - Active Routing & Guarding Utility Service
 A.R.G.U.S. は、ローカルで動作する高機能なフィルタリング・プロキシシステムです。指定したドメインへのアクセスをブロックし、すべての通信ログを記録・管理するためのWebダッシュボードを提供します。
 
 ---
