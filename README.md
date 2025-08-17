@@ -57,7 +57,8 @@ venv\Scripts\activate
 ```cmd  
 pip install mitmproxy
 pip install flask
-pip install sqlalchemy  
+pip install sqlalchemy
+pip install flask-socketio 
 ```
 これで、すべてのセットアップ作業は完了です。
 
