@@ -63,7 +63,7 @@ pip install mitmproxy flask sqlalchemy
 
 ## 使い方
 
-### 1. A.R.G.U.S. の起動
+### 1. A.R.G.U.S.-v2 の起動
 
 手動で起動するか、バッチファイルで起動するかを選べます。
 
