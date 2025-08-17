@@ -38,12 +38,12 @@ A.R.G.U.S.の起動後、以下のURLにアクセスしてください。
 
 ### ステップ 1: プロジェクトフォルダへ移動
 ```cmd  
-cd /d "C:\path\to\your\A.R.G.U.S-project"  
+cd /d "C:\dev\A.R.G.U.S.-v2"  
 ```
 
 ### ステップ 2: Python仮想環境の作成
 ```cmd  
-py -3 -m venv venv  
+python -m venv venv 
 ```
 この操作は、PCごとに最初の1回だけでOKです。
 
@@ -55,7 +55,9 @@ venv\Scripts\activate
 
 ### ステップ 4: 必要なライブラリのインストール
 ```cmd  
-pip install mitmproxy flask sqlalchemy  
+pip install mitmproxy
+pip install flask
+pip install sqlalchemy  
 ```
 これで、すべてのセットアップ作業は完了です。
 
