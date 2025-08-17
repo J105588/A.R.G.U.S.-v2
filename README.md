@@ -86,7 +86,7 @@ pip install sqlalchemy
 1.  コマンドプロンプトを開き、プロジェクトフォルダに移動して仮想環境を有効化します (`venv\Scripts\activate`)。
 2.  その状態で以下のコマンドを入力して実行します。
     ```cmd  
-    final-start.bat  
+    .\final-start.bat 
     ```
 
 ### 2. プロキシの設定
