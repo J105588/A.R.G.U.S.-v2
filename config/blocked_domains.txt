@@ -1,0 +1,5 @@
+# ブロック対象ドメイン（1行に1つ）
+# 例:
+# facebook.com
+# twitter.com
+youtube.com

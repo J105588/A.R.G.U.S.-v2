@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.R.G.U.S. v2.0 - Network Monitoring System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ A.R.G.U.S. v2.0</h1>
+            <p>Advanced Real-time Gateway Unified Security System</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-button active" onclick="showTab('dashboard')">ダッシュボード</button>
+            <button class="tab-button" onclick="showTab('traffic')">通信監視</button>
+            <button class="tab-button" onclick="showTab('rules')">ルール管理</button>
+            <button class="tab-button" onclick="showTab('settings')">設定</button>
+        </nav>
+
+        <!-- ダッシュボード -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>総リクエスト数</h3>
+                    <div class="stat-value" id="total-requests">0</div>
+                </div>
+                <div class="stat-card blocked">
+                    <h3>ブロック数</h3>
+                    <div class="stat-value" id="total-blocked">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>データ転送量</h3>
+                    <div class="stat-value" id="total-bytes">0 KB</div>
+                </div>
+                <div class="stat-card">
+                    <h3>システム状態</h3>
+                    <div class="stat-value status" id="system-status">🟢 稼働中</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>時間別トラフィック統計</h3>
+                <canvas id="trafficChart"></canvas>
+            </div>
+
+            <div class="recent-activity">
+                <h3>最近のアクティビティ</h3>
+                <div id="recent-logs" class="log-list">
+                    <!-- 動的に更新される -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 通信監視 -->
+        <div id="traffic" class="tab-content">
+            <div class="controls">
+                <button onclick="refreshTrafficLogs()" class="btn btn-primary">更新</button>
+                <button onclick="window.open('http://localhost:8081')" class="btn btn-secondary">mitmweb起動</button>
+            </div>
+            
+            <div class="traffic-logs">
+                <table id="traffic-table">
+                    <thead>
+                        <tr>
+                            <th>時刻</th>
+                            <th>クライアント</th>
+                            <th>メソッド</th>
+                            <th>URL</th>
+                            <th>ステータス</th>
+                            <th>ブロック</th>
+                            <th>詳細</th>
+                        </tr>
+                    </thead>
+                    <tbody id="traffic-tbody">
+                        <!-- 動的に更新される -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ルール管理 -->
+        <div id="rules" class="tab-content">
+            <div class="rules-section">
+                <h3>フィルタリング制御</h3>
+                <div class="master-switch">
+                    <label class="switch">
+                        <input type="checkbox" id="filtering-toggle" onchange="toggleFiltering()">
+                        <span class="slider"></span>
+                    </label>
+                    <span>フィルタリング有効</span>
+                </div>
+            </div>
+
+            <div class="rules-section">
+                <h3>ブロック対象ドメイン</h3>
+                <div class="add-rule">
+                    <input type="text" id="new-domain" placeholder="例: example.com">
+                    <button onclick="addDomain()" class="btn btn-primary">追加</button>
+                </div>
+                <ul id="domains-list" class="rules-list">
+                    <!-- 動的に更新される -->
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>ブロック対象キーワード</h3>
+                <div class="add-rule">
+                    <input type="text" id="new-keyword" placeholder="キーワードまたは regex:パターン">
+                    <button onclick="addKeyword()" class="btn btn-primary">追加</button>
+                </div>
+                <ul id="keywords-list" class="rules-list">
+                    <!-- 動的に更新される -->
+                </ul>
+            </div>
+
+            <div class="controls">
+                <button onclick="reloadRules()" class="btn btn-secondary">ルール再読み込み</button>
+            </div>
+        </div>
+
+        <!-- 設定 -->
+        <div id="settings" class="tab-content">
+            <div class="settings-section">
+                <h3>証明書ダウンロード</h3>
+                <p>HTTPS通信を監視するには、クライアントデバイスにmitmproxyの証明書をインストールする必要があります。</p>
+                <button onclick="downloadCertificate()" class="btn btn-primary">証明書ダウンロード</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>アクセス情報</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>プロキシ設定:</strong>
+                        <code>localhost:8080</code>
+                    </div>
+                    <div class="info-item">
+                        <strong>mitmweb UI:</strong>
+                        <a href="http://localhost:8081" target="_blank">http://localhost:8081</a>
+                    </div>
+                    <div class="info-item">
+                        <strong>管理画面:</strong>
+                        <code>http://localhost:5000</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 詳細モーダル -->
+        <div id="detail-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeDetailModal()">&times;</span>
+                <h2>通信詳細</h2>
+                <div id="detail-content">
+                    <!-- 動的に更新される -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
